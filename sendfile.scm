@@ -49,6 +49,8 @@
 ;;set to either 'sendfile 'mmapped 'read-write or 'nothing
 (define force-implementation (make-parameter 'nothing))
 
+(define write-timeout (make-parameter #f))
+
 
 ;;the buffer used in read write loops
 ;;the client may adjust this to meet its need
