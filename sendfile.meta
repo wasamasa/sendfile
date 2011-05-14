@@ -1,0 +1,7 @@
+((egg "sendfile.egg")
+ (files "sendfile.setup" "sendfile.meta" "strategies/sendfile.linux.scm" "strategies/sendfile.solaris.scm" "strategies/mmap.scm" "strategies/rw.scm" "strategies/sendfile.bsd.scm" "strategies/sendfile.macos.scm" "sendfile.release-info" "sendfile.scm" "tests/offset-test.txt" "tests/run.scm" "tests/test-utils.scm")
+ (license "BSD")
+ (category net)
+ (author "David Krentzlin")
+ (test-depends test)
+ (synopsis "Sending a file over the network"))

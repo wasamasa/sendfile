@@ -1,0 +1,9 @@
+(run (csc -s -d0 -O2 -j sendfile sendfile.scm sendfile-implementation.c))
+(run (csc -s -d0 -O2 sendfile.import.scm))
+(run (csc -c -d0 -O2 sendfile.scm sendfile-implementation.c -unit sendfile -o sendfile-static.o))
+(install-extension 
+  'sendfile
+  '("sendfile.so" "sendfile.import.so" "sendfile-static.o")
+  '((version "1.7.2")
+    (static "sendfile-static.o")
+    (documentation "sendfile.html")))

@@ -1,0 +1,15 @@
+Hmm, not quite sure what you're asking... you haven't really defined the "problem".
+
+The alignment restriction simply means that any offset value you provide has to be a multiple of the page size. For most systems, that will be a multiple of 4096.
+
+For instance, if you want to mmap 100 bytes starting at offset 50, then you have to use an offset of 0 (not 100, not 100 * 4096, not any other value), and a length of at least 150.
+
+You could do that. Alternatively, you could give 0 and just look at a correspondingly higher byte in the mmaped region. It's up to you.
+
+mmap just provides a "view" onto some file descriptor. The view must be aligned to a page boundary, but it can essentially have any length. You can look at any byte within the view.
+
+
+TODO:
+
+clean up the mmap code. It's too hard to follow
+
