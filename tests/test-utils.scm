@@ -28,9 +28,17 @@
 (define test-file-checksum #f)
 
 ;; the server is started before the test-suite is run
-;; it listens on 5555 and writes anything it recieves to a fixed location
+;; it listens on 5555 and writes anything it recieves to a fixed
+;; location
+
+(define (server-port)
+  (let ((p (get-environment-variable "SENDFILE_TEST_PORT")))
+    (if p
+        (string->number p)
+        5555)))
+
 (define (server)
-  (let ((listener (tcp-listen 5555)))
+  (let ((listener (tcp-listen (server-port))))
     (let loop ()
       (receive (i o) (tcp-accept listener)
         (let* ((file (open-output-file test-file-out #:binary))
@@ -77,7 +85,7 @@
   (if (file-exists? test-file-out) (delete-file test-file-out)))
 
 
-(define (with-prepared-environment file proc #!optional (ports? #f) (cleanup? #t))
+(define (with-prepared-environment file proc #!optional (ports? #f)  (cleanup? #t))
   (when cleanup?
     (destroy-test-file-out))
   
@@ -86,7 +94,7 @@
           (size (file-size file)))
       ;; Touch or truncate file
       (unless (file-exists? file) (with-output-to-file file void))
-      (receive (i o) (tcp-connect "localhost" 5555)
+      (receive (i o) (tcp-connect "localhost" (server-port))
         (dynamic-wind
             void
             (lambda () (proc in (if ports? o (port->fileno o))))
@@ -101,7 +109,7 @@
 (define (can-connect?)
   (handle-exceptions exn #f
     (receive (in out)
-        (tcp-connect "localhost" 5555)
+        (tcp-connect "localhost" (server-port))
       (close-input-port in)
       (close-output-port out)
       #t)))
@@ -127,7 +135,7 @@
 
 (define (start-server)
   (newline)
-  (notify "starting server on port 5555")
+  (notify "starting server on port ~A" (server-port))
   (let ((pid (process-fork server)))
     (unless (wait-for-server 3)
       (notify "could not start server!!!")
