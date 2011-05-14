@@ -1,5 +1,5 @@
 ((egg "sendfile.egg")
- (files "sendfile.setup" "sendfile.meta" "strategies/sendfile.linux.scm" "strategies/sendfile.solaris.scm" "strategies/mmap.scm" "strategies/rw.scm" "strategies/sendfile.bsd.scm" "strategies/sendfile.macos.scm" "sendfile.release-info" "sendfile.scm" "tests/offset-test.txt" "tests/run.scm" "tests/test-utils.scm")
+ (files ".hgignore" "sendfile.import.scm" "sendfile.meta" "sendfile.release-info" "sendfile.scm" "sendfile.setup" "strategies/mmap.scm" "strategies/rw.scm" "strategies/sendfile.bsd.scm" "strategies/sendfile.linux.scm" "strategies/sendfile.macos.scm" "strategies/sendfile.solaris.scm" "tests/offset-test.txt" "tests/run.scm" "tests/test-utils.scm")
  (license "BSD")
  (category net)
  (author "David Krentzlin")
