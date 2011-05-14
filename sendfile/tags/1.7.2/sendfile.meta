@@ -1,8 +1,0 @@
-((egg "sendfile.egg")
- (files "sendfile.doc.scm" "sendfile.scm" "sendfile-implementation.c"  "os-dep.h" "sendfile.setup" "sendfile.html")
- (eggdoc "sendfile.doc.scm")
- (license "BSD")
- (category net)
- (author "David Krentzlin")
- (test-depends test)
- (synopsis "Sending a file over the network"))
