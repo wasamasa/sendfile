@@ -137,7 +137,7 @@
                      offset-test-file
                      (lambda (in out)
                        (parameterize ((force-implementation 'read-write-port))
-                         (sendfile in out offset: 1400))) #t)
+                         (sendfile in out offset: 1400))) #t #f)
                     (file-contents test-file-out)))
 
             (test "giving size"
@@ -147,7 +147,7 @@
                      offset-test-file
                      (lambda (in out)
                        (parameterize ((force-implementation 'read-write-port))
-                         (sendfile in out bytes: 32))) #t)
+                         (sendfile in out bytes: 32))) #t #f)
                     (file-contents test-file-out)))
 
             (test "giving size and offset"
@@ -157,7 +157,7 @@
                      offset-test-file
                      (lambda (in out)
                        (parameterize ((force-implementation 'read-write-port))
-                         (sendfile in out offset: 213 bytes: 15))) #t)
+                         (sendfile in out offset: 213 bytes: 15))) #t #f)
                     (file-contents test-file-out)))
 
             
@@ -176,7 +176,7 @@
        test-file-size
        (with-prepared-environment test-file
         (lambda (in out)
-          (impl:read-write-loop/fd in out 0 test-file-size))))
+          (impl:read-write-loop/fd in out 0 test-file-size)) #f #f))
       (sleep 1)
       (test "verify"
        test-file-checksum
@@ -187,7 +187,7 @@
         test-file-size
         (with-prepared-environment test-file
          (lambda (in out)
-             (impl:read-write-loop/port in out 0 test-file-size)) #t))
+             (impl:read-write-loop/port in out 0 test-file-size)) #t #f))
       (sleep 1)
       (test "verify"
        test-file-checksum
@@ -200,7 +200,7 @@
                       test-file-size 
                       (with-prepared-environment test-file
                        (lambda (in out)
-                         (impl:sendfile in out 0 test-file-size))))
+                         (impl:sendfile in out 0 test-file-size)) #f #f))
                  (sleep 1)
                  (test "verify"
                        test-file-checksum
@@ -213,7 +213,7 @@
                       test-file-size 
                       (with-prepared-environment test-file
                        (lambda (in out)
-                         (impl:mmapped in out 0 test-file-size))))
+                         (impl:mmapped in out 0 test-file-size)) #f #f))
                 (sleep 1)
                 (test "verify"
                       test-file-checksum
@@ -229,11 +229,26 @@
             test-file-size
             (with-prepared-environment test-file
              (lambda (in out)
-               (sendfile in out)) #t))
+               (sendfile in out)) #t #f))
       (sleep 1)
       (test "verify"
             test-file-checksum
             (compute-file-checksum test-file-out)))
+
+
+
+
+(test-group "custom input port without fd [bug #542]"
+            (let ((test-content "I'm content from a custom port"))
+              (test "send"
+                    (string-length test-content)
+                    (with-prepared-environment test-file
+                                               (lambda (ignored out)
+                                                 (sendfile
+                                                  (open-input-string test-content)
+                                                  out)) #t #t))))
+
+
 
 (test-end "interface")
 

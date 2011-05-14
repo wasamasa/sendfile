@@ -38,7 +38,7 @@
  impl:read-write-loop/port mmap-available sendfile-available sendfile)
 (import chicken scheme)
 (require-library posix lolevel srfi-4)
-(import extras posix srfi-4 foreign lolevel)
+(import extras posix srfi-4 foreign lolevel ports)
 
 
 (define (kilobytes num)  (* num 1024))
@@ -233,33 +233,54 @@
    ((and bytes (> (+ offset bytes) size)) (complain #f "Bytes + offset exceeds filesize" ))
    (else #t)))
 
-(define (sendfile src dst #!key (offset 0) (bytes #f))
-    (let* ((src (->fileno src))
-           (size (file-size src))
-           (len  (or bytes (- size offset))))
-      
-      ;; ensure sane offset/bytes
-      (ensure-sane-offset/bytes size offset bytes)
-      (if (or (and (eq? (force-implementation) 'read-write-port) (port? dst))
-              (and (port? dst) (not (port-has-fd? dst))))
-          (impl:read-write-loop/port src dst offset len)
-          (begin
-            (flush-output dst) ; Implementations below use non-buffered I/O
-            (let ((dst (->fileno dst)))
-              (case (force-implementation)
-                ((sendfile)
-                 (if sendfile-available
-                     (impl:sendfile src dst offset len)
-                     (complain #f "implementation sendfile was forced but is not available")))
-                ((mmapped)
-                 (if mmap-available
-                     (impl:mmapped src dst offset len)
-                     (complain #f "implementation mmap was forced but is not available")))
-                ((read-write)      (impl:read-write-loop/fd src dst offset len))
-                ((nothing)
-                 (let ((impl ((implementation-selector) size)))
-                   (impl src dst offset len)))
-                (else
-                 (complain #f "invalid implementation forced. Allowed values are (sendfile mmapped read-write read-write-port nothing)"))))))))
+(define (sendfile source target #!key (offset 0) (bytes #f))
+  (cond
+   ((ports? source target)
+    (sendfile/ports source target offset bytes))
+   (else (sendfile/best-strategy source target offset  bytes))))
 
-) ; module
+(define (port-without-fd? port)
+  (and (port? port) (not (port-has-fd? port))))
+
+(define (ports? source target)
+  (or
+   (and (eq? (force-implementation) 'read-write-port) (port? target))
+   (port-without-fd? source)
+   (port-without-fd? target)))
+
+(define (sendfile/ports source target offset bytes-to-send)
+  (if (port-without-fd? source)
+      (impl:read-write-loop/port-both source target offset  bytes-to-send)
+      (let* ((source  (->fileno source))
+             (size (file-size source))
+             (len (or bytes-to-send (- size offset))))
+        
+        (ensure-sane-offset/bytes size offset bytes-to-send)
+        (impl:read-write-loop/port source target offset len))))
+
+(define (sendfile/best-strategy source target offset bytes-to-send)
+    (let* ((source (->fileno source))
+           (size (file-size source))
+           (len  (or bytes-to-send (- size offset))))
+
+      (ensure-sane-offset/bytes size offset bytes-to-send)
+      (flush-output target)
+      (let ((target (->fileno target)))
+        (case (force-implementation)
+          ((sendfile)
+           (if sendfile-available
+               (impl:sendfile source target offset len)
+               (complain #f "implementation sendfile was forced but is not available")))
+          ((mmapped)
+           (if mmap-available
+               (impl:mmapped source target offset len)
+               (complain #f "implementation mmap was forced but is not available")))
+          ((read-write)      (impl:read-write-loop/fd source target offset len))
+          ((nothing)
+           (let ((impl ((implementation-selector) size)))
+             (impl source target offset len)))
+          (else
+           (complain #f "invalid implementation forced. Allowed values are (sendfile mmapped read-write read-write-port nothing)"))))))
+)
+
+

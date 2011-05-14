@@ -1,6 +1,36 @@
 (define sys-seek (foreign-lambda int "lseek" integer integer int))
 (define-foreign-variable seek-set int "SEEK_SET")
 
+
+(define (impl:read-write-loop/port-both src dst offset bytes)
+  (set!  *last-selected-implementation* 'read-write-loop)
+  
+  (when (positive? offset)
+    (port-seek src offset))
+
+  (cond
+   ((not bytes)
+    (let ((bytes-send 0))
+      (copy-port src dst read-char (lambda (c to)
+                                     (set! bytes-send (+ bytes-send 1))
+                                     (write-char c to)))
+      bytes-send))
+   (else
+    (let loop ((bytes bytes))
+      (if (positive? bytes)
+        (let ((char (read-char src)))
+          (unless (eof-object? char)
+            (write-char char dst)
+            (loop (- bytes 1))))))
+    bytes)))
+
+(define (port-seek port bytes)
+  (let loop ((bytes bytes))
+        (when (positive? bytes)
+          (let ((char (read-char port)))
+            (unless (eof-object? char)
+              (loop (- bytes 1)))))))
+
 (define (impl:read-write-loop/port src dst offset bytes)
   (set!  *last-selected-implementation* 'read-write-loop)
   
@@ -16,6 +46,7 @@
           bytes-read
           (let* ((to-read (fxmin buffsize (inexact->exact bytes-left)))
                  (read-bytes (cadr (file-read src to-read buffer))))
+;            (printf "Now writing ~A~%" (substring buffer 0 read-bytes))
             (display (substring buffer 0 read-bytes) dst)
             (loop (- bytes-left read-bytes) (+ bytes-read read-bytes)))))))
 

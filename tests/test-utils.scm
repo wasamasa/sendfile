@@ -13,6 +13,7 @@
 ;; the size of the file to transfer in bytes
 (define wanted-test-file-size (* 1024 1024))
 
+
 ;; this may differ slightly from wanted-test-file-size
 ;; it is computed using (file-size)
 ;; The reason for the difference is that we use a fixed-size
@@ -72,8 +73,14 @@
 (define (destroy-test-files)
   (if (file-exists? test-file) (delete-file test-file)))
 
+(define (destroy-test-file-out)
+  (if (file-exists? test-file-out) (delete-file test-file-out)))
 
-(define (with-prepared-environment file proc #!optional (ports? #f) (return-output #f))
+
+(define (with-prepared-environment file proc #!optional (ports? #f) (cleanup? #t))
+  (when cleanup?
+    (destroy-test-file-out))
+  
   (parameterize ((tcp-read-timeout 3))
     (let ((in (file-open file (bitwise-ior open/rdonly open/binary)))
           (size (file-size file)))
@@ -144,5 +151,5 @@
 
 (define (tear-down pid)
   (destroy-test-files)
-  (stop-server pid))        
+  (stop-server pid))
       
