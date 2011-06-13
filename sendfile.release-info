@@ -1,4 +1,13 @@
 (repo hg "https://bitbucket.org/certainty/{egg-name}")
 (uri targz "https://bitbucket.org/certainty/{egg-name}/get/{egg-release}.tar.gz")
+(uri files-list "http://code.call-cc.org/files-list?egg={egg-name};release={egg-release}" old-uri)
+
+(release "1.6.0" old-uri)
+(release "1.6.1" old-uri)
+(release "1.6.2" old-uri)
+(release "1.6.3" old-uri)
+(release "1.7" old-uri)
+(release "1.7.1" old-uri)
+(release "1.7.2" old-uri)
 (release "1.7.3")
 (release "1.7.4")
