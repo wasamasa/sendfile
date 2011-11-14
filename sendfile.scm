@@ -40,6 +40,7 @@
 (require-library posix lolevel srfi-4)
 (import extras posix srfi-4 foreign lolevel ports)
 
+(include "backward-compatibility.scm")
 
 (define (kilobytes num)  (* num 1024))
 (define (megabytes num)  (* (kilobytes num) 1024))

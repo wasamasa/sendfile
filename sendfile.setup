@@ -90,6 +90,11 @@ CODE
            (try-compile sendfile-sun-test compile-only: #t))
           (else #f)))
 
+;; Compatibility with older chickens
+(if (string< (chicken-version) "4.6")
+    (copy-file (make-pathname "backward-compatibility" "copy-port.scm")
+               (make-pathname (current-directory) "backward-compatibility.scm"))
+    (with-output-to-file "backward-compatibility.scm" (cut display "")))
 
 (let ((features '()))
   (when madvise?
