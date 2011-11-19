@@ -206,7 +206,7 @@
 ;; It tries to select the apropriate implementation but is not fool-proof
 (define (default-selector len)
   (cond
-   ((> len (megabytes 1) impl:read-write-loop/fd ))
+   ((> len (megabytes 1)) impl:read-write-loop/fd)
    (else
     (cond-expand
       (sendfile impl:sendfile)
