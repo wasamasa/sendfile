@@ -1,8 +1,26 @@
-(use srfi-69)
+(use srfi-69 tcp (srfi 4) posix)
 
 (define (notify fmt . args)
   (apply printf fmt args)
   (flush-output))
+
+(define (with-prepared-environment file proc #!optional (ports? #f)  (cleanup? #t))
+  (when cleanup?
+    (destroy-test-file-out))  
+  (parameterize ((tcp-read-timeout 3))
+    (let ((in (file-open file (bitwise-ior open/rdonly open/binary)))
+          (size (file-size file)))
+      ;; Touch or truncate file
+      (unless (file-exists? file) (with-output-to-file file void))
+      (receive (i o) (tcp-connect "localhost" (server-port))
+        (dynamic-wind
+            void
+            (lambda () (proc in (if ports? o (port->fileno o))))
+            (lambda ()
+              (close-input-port i)
+              (close-output-port o)
+              (file-close in)))))))
+
 
 ;; the file that is send over the wire
 (define test-file "/tmp/sendfile-test.data")
@@ -85,25 +103,6 @@
   (if (file-exists? test-file-out) (delete-file test-file-out)))
 
 
-(define (with-prepared-environment file proc #!optional (ports? #f)  (cleanup? #t))
-  (when cleanup?
-    (destroy-test-file-out))
-  
-  (parameterize ((tcp-read-timeout 3))
-    (let ((in (file-open file (bitwise-ior open/rdonly open/binary)))
-          (size (file-size file)))
-      ;; Touch or truncate file
-      (unless (file-exists? file) (with-output-to-file file void))
-      (receive (i o) (tcp-connect "localhost" (server-port))
-        (dynamic-wind
-            void
-            (lambda () (proc in (if ports? o (port->fileno o))))
-            (lambda ()
-              (close-input-port i)
-              (close-output-port o)
-              (file-close in)))))))
-
-
 ;; tests if server is allready up
 ;; thanks to Peter Bex
 (define (can-connect?)
@@ -134,24 +133,17 @@
 
 
 (define (start-server)
-  (newline)
-  (notify "starting server on port ~A" (server-port))
   (let ((pid (process-fork server)))
     (unless (wait-for-server 3)
       (notify "could not start server!!!")
       (destroy-test-files)
       (exit 0))
-    (newline)
-    (notify "standby")
     (flush-output)
     (sleep 4)
     pid))
 
 (define (stop-server pid)
-  (notify "shutting down")
-  (process-signal pid)
-  (newline)
-  (notify "sent SIGTERM to server. Please make sure the server isn't running anymore!"))
+  (process-signal pid))
 
 (define (setup)
   (generate-test-files)
@@ -160,4 +152,32 @@
 (define (tear-down pid)
   (destroy-test-files)
   (stop-server pid))
-      
+
+
+
+;; New test helpers
+;; try to implement some nicer abstractions
+(define (with-running-server thunk)
+  (let ((pid (start-server)))
+    (thunk)
+    (stop-server pid)))
+
+;; access the running server
+(define (call-with-connection-to-server proc)
+  (parameterize ((tcp-read-timeout 3))
+    (receive (input output) (tcp-connect "localhost" (server-port))
+      (let ((result (proc input output)))
+        (close-input-port input)
+        (close-output-port output)
+        result))))
+
+;; generate files
+(define (with-temporary-file bytes proc)
+  (let ((path (create-temporary-file)))
+    (with-output-to-file path (fill-file-with-bytes bytes))
+    (let ((result (proc path)))
+      (delete-file path)
+      result)))
+
+(define ((fill-file-with-bytes bytes))
+  (write (make-string bytes)))
