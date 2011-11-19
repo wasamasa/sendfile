@@ -1,3 +1,5 @@
+(use posix)
+
 (define madvise-test #<<CODE
 #include "sys/mman.h"
 int main (){
@@ -114,8 +116,3 @@ CODE
     '((version "1.7.8")
      (static "sendfile-static.o")
      (documentation "sendfile.html"))))
-
-;; cleanup temp-files
-;; remove this in production
-(system "rm *.o")
-
