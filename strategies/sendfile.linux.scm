@@ -20,11 +20,13 @@
   (else
    (define %sendfile-implementation
      (foreign-lambda*  double ((integer src) (integer dst) (double offset) (unsigned-integer to_send))
-       "size_t res = 0;"
        "off_t curoffset = (off_t)offset;"
        "if(sendfile(dst,src,&curoffset,to_send) < 0){"
-       "   if(errno == EAGAIN || errno == EINTR){ C_return(-2); }"
-       "   C_return(-1);"
+       "   if(errno == EAGAIN || errno == EINTR){    "
+       "     C_return(curoffset == 0 ? -2 (double)(curoffset)); "
+       "   }else{ "
+       "     C_return(-1);"
+       "   }"
        "}"
        "C_return((double)curoffset);"))))
 
