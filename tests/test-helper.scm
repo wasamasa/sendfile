@@ -93,15 +93,18 @@
         (close-output-port output)
         result))))
 
-(define (stream-file path size)
-  (call-with-connection-to-server
-   (lambda (input output)
-     (display size output)
-     (newline output)
-     (call-with-input-file path
-       (lambda (input-file)
-         (sendfile input-file output)))
-     (read-line input))))
+(define (stream-file path streamer)
+  (let ((size (file-size path))
+        (file-port (file-open path (bitwise-ior open/rdonly open/binary))))
+    (call-with-connection-to-server
+     (lambda (server-input server-output)
+       (display size server-output)
+       (newline server-output)
+       
+       (streamer file-port server-output)
+       
+       (flush-output server-output)
+       (read-line server-input)))))
 
 ;generate a string of bytes bytes
 (define (with-buffer bytes proc)
@@ -119,7 +122,6 @@
   (call-with-temporary-file content
     (lambda (tempfile-path)
       (proc tempfile-path (buffer-checksum content)))))
-
 
 
 
