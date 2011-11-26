@@ -136,8 +136,6 @@
     (lambda (tempfile-path)
       (proc tempfile-path (buffer-checksum content)))))
 
-
-
 (define (mebibytes amount)
   (* amount (kibibytes 1024)))
 

@@ -11,16 +11,27 @@
 
  (let* ((mb-buffer (generate-buffer (mebibytes 1)))
         (mb-checksum (buffer-checksum mb-buffer)))
+
+
+   (define (stream-mb-buffer)
+     (call-with-temporary-file/checksum
+      mb-buffer
+      (lambda (temp-file _)
+        (stream-file temp-file sendfile))))
  
    (test-group "sendfile main interface"
                (test "sendfile"
                      mb-checksum
-                     (call-with-temporary-file/checksum
-                      mb-buffer
-                      (lambda (temp-file _)
-                        (stream-file temp-file sendfile)))))
+                     (stream-mb-buffer)))
 
-   (test-group "regression"               
+
+   (test-group "forcing implementation"
+               (parameterize ((force-implementation 'read-write))
+                 (test "read-write"
+                       mb-checksum
+                       (stream-mb-buffer))))
+
+   (test-group "bugs"               
                (call-with-buffer/checksum
                 (kibibytes 1)
                 (lambda (buffer checksum)
