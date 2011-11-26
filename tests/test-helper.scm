@@ -29,7 +29,8 @@
 ;; the handler reads the input and writes back the checksum of
 ;; the data received.
 ;; Important: the implementation expected the bytes to receive to be
-;; the very first line of input
+;; the very first line of input. If this size is -1 then we just read
+;; until we reach eof-object
 
 ;; Use it like so:
 ;; (call-with-connection-to-server (lambda (i o) (display "4" o) (newline o) (display "aaaa" o) (read-line i)))
@@ -38,9 +39,10 @@
       (begin (display "Error" output)
              (display (get-condition-property exn 'exn 'msg) output)
              (newline output))
-    (let* ((bytes-following (read-line input)))
-      (unless (eof-object? bytes-following)
-        (let ((content (read-string (string->number bytes-following) input)))
+    (let* ((header (read-line input)))
+      (unless (eof-object? header)
+        (let* ((bytes-following (string->number header))
+               (content (read-string (if (positive? bytes-following) bytes-following #f) input)))
           (display (buffer-checksum content) output)
           (newline output)
           (flush-output output))))))
@@ -114,8 +116,8 @@
   (read-line port))
 
 ;generate a string of bytes bytes
-(define (call-with-buffer bytes proc)
-  (proc (make-string bytes #\a)))
+(define (call-with-buffer bytes proc #!optional (char #\a))
+  (proc (make-string bytes char)))
 
 (define (call-with-buffer/checksum buffer-size proc)
   (call-with-buffer
@@ -142,5 +144,5 @@
 (define (kibibytes amount)
   (* amount 1024))
 
-(define (generate-buffer bytes)
-  (call-with-buffer bytes identity))
+(define (generate-buffer bytes #!optional (char #\a))
+  (call-with-buffer bytes identity char))
