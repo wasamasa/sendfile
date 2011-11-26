@@ -155,29 +155,4 @@
 
 
 
-;; New test helpers
-;; try to implement some nicer abstractions
-(define (with-running-server thunk)
-  (let ((pid (start-server)))
-    (thunk)
-    (stop-server pid)))
 
-;; access the running server
-(define (call-with-connection-to-server proc)
-  (parameterize ((tcp-read-timeout 3))
-    (receive (input output) (tcp-connect "localhost" (server-port))
-      (let ((result (proc input output)))
-        (close-input-port input)
-        (close-output-port output)
-        result))))
-
-;; generate files
-(define (with-temporary-file bytes proc)
-  (let ((path (create-temporary-file)))
-    (with-output-to-file path (fill-file-with-bytes bytes))
-    (let ((result (proc path)))
-      (delete-file path)
-      result)))
-
-(define ((fill-file-with-bytes bytes))
-  (write (make-string bytes)))
