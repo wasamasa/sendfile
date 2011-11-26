@@ -107,8 +107,14 @@
        (read-line server-input)))))
 
 ;generate a string of bytes bytes
-(define (with-buffer bytes proc)
+(define (call-with-buffer bytes proc)
   (proc (make-string bytes #\a)))
+
+(define (call-with-buffer/checksum buffer-size proc)
+  (call-with-buffer
+   buffer-size
+   (lambda (buffer)
+     (proc buffer (buffer-checksum buffer)))))
 
 ;; generate files
 (define (call-with-temporary-file content proc)
@@ -132,4 +138,4 @@
   (* amount 1024))
 
 (define (generate-buffer bytes)
-  (with-buffer bytes identity))
+  (call-with-buffer bytes identity))
