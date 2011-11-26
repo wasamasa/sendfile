@@ -93,18 +93,25 @@
         (close-output-port output)
         result))))
 
+
 (define (stream-file path streamer)
   (let ((size (file-size path))
         (file-port (file-open path (bitwise-ior open/rdonly open/binary))))
     (call-with-connection-to-server
      (lambda (server-input server-output)
-       (display size server-output)
-       (newline server-output)
+       (write-content-size server-output size)
        
        (streamer file-port server-output)
        
        (flush-output server-output)
-       (read-line server-input)))))
+       (read-checksum server-input)))))
+
+(define (write-content-size port size)
+  (display size port)
+  (newline port))
+
+(define (read-checksum port)
+  (read-line port))
 
 ;generate a string of bytes bytes
 (define (call-with-buffer bytes proc)
@@ -131,7 +138,7 @@
 
 
 
-(define (mibibytes amount)
+(define (mebibytes amount)
   (* amount (kibibytes 1024)))
 
 (define (kibibytes amount)
