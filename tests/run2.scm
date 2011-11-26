@@ -29,7 +29,33 @@
                (parameterize ((force-implementation 'read-write))
                  (test "read-write"
                        mb-checksum
-                       (stream-mb-buffer))))
+                       (stream-mb-buffer)))
+
+               (if sendfile-available
+                   (parameterize ((force-implementation 'sendfile))
+                     (test "sendfile(2)"
+                           mb-checksum
+                           (stream-mb-buffer))))
+
+               (if mmap-available
+                   (parameterize ((force-implementation 'mmapped))
+                     (test "mmap(2)"
+                           mb-checksum
+                           (stream-mb-buffer))))
+
+               
+               (parameterize ((force-implementation 'read-write-port))
+                 (test "read-write-port"
+                       mb-checksum
+                       (stream-mb-buffer)))
+
+
+               )
+
+
+   
+
+   
 
    (test-group "bugs"               
                (call-with-buffer/checksum
