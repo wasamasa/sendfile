@@ -6,12 +6,10 @@
 (load "test-helper")
 (use sendfile)
 
-
 (with-running-server
 
  (let* ((mb-buffer (generate-buffer (mebibytes 1)))
         (mb-checksum (buffer-checksum mb-buffer)))
-
 
    (define (stream-mb-buffer)
      (call-with-temporary-file/checksum
@@ -20,7 +18,6 @@
         (stream-file temp-file sendfile))))
  
    (test-group "sendfile main interface"
-               
                (test "sendfile" mb-checksum (stream-mb-buffer)))
 
    (test-group "forcing implementation"
@@ -81,8 +78,7 @@
                        (buffer-checksum tail)
                        (chunking-test
                         (lambda (input output)
-                          (sendfile input output offset: 40)))
-                       )
+                          (sendfile input output offset: 40))))
                  (test "size"
                        (buffer-checksum head)
                        (chunking-test
