@@ -1,5 +1,5 @@
 ((egg "sendfile.egg")
- (files ".hgignore" "backward-compatibility.scm" "backward-compatibility/copy-port.scm" "old-chickens-compat.scm" "sendfile.import.scm" "sendfile.meta" "sendfile.release-info" "sendfile.scm" "sendfile.setup" "strategies/mmap.scm" "strategies/rw.scm" "strategies/sendfile.bsd.scm" "strategies/sendfile.linux.scm" "strategies/sendfile.macos.scm" "strategies/sendfile.solaris.scm" "tests/run.scm" "tests/sendfile-spec.scm" "tests/test-helper.scm" "tests/test-server.scm")
+ (files ".hgignore" "backward-compatibility.scm" "backward-compatibility/copy-port.scm" "old-chickens-compat.scm" "sendfile.import.scm" "sendfile.meta" "sendfile.release-info" "sendfile.scm" "sendfile.setup" "strategies/mmap.scm" "strategies/rw.scm" "strategies/sendfile.bsd.scm" "strategies/sendfile.linux.scm" "strategies/sendfile.macos.scm" "strategies/sendfile.solaris.scm" "tests/run.scm" "tests/test-helper.scm" "tests/test-server.scm")
  (license "BSD")
  (category net)
  (author "David Krentzlin")
