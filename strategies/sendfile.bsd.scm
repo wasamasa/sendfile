@@ -1,4 +1,9 @@
-(foreign-declare "#include<sys/socket.h>\n#include<sys/types.h>#include <sys/uio.h>")
+(foreign-declare "
+#define _XOPEN_SOURCE 600
+#include<sys/socket.h>
+#include<sys/types.h>
+#include <sys/uio.h>")
+
 (cond-expand
   (posix-fadvise
    (foreign-declare "#define READ_AHEAD (4 * 1024 * 1024)")

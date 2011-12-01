@@ -1,4 +1,8 @@
-(foreign-declare "#include <sys/sendfile.h>\n#define _XOPEN_SOURCE 600\n#include <fcntl.h>\n#include<errno.h>")
+(foreign-declare "
+#define _XOPEN_SOURCE 600
+#include <sys/sendfile.h>
+#include <fcntl.h>
+#include<errno.h>")
 (cond-expand
   (posix-fadvise
    (foreign-declare "#define READ_AHEAD (4 * 1024 * 1024)")
