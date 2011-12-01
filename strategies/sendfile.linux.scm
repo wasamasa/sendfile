@@ -1,5 +1,4 @@
 (foreign-declare "
-#define _XOPEN_SOURCE 600
 #include <sys/sendfile.h>
 #include <fcntl.h>
 #include<errno.h>")

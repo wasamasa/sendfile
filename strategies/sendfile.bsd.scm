@@ -1,5 +1,4 @@
 (foreign-declare "
-#define _XOPEN_SOURCE 600
 #include<sys/socket.h>
 #include<sys/types.h>
 #include <sys/uio.h>")

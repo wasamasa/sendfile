@@ -31,6 +31,7 @@
 ;; OTHER DEALINGS IN THE SOFTWARE.
 ;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(foreign-declare "#define _XOPEN_SOURCE 600")
 
 (module sendfile
 (force-implementation *last-selected-implementation* read-write-buffer-size
@@ -39,6 +40,8 @@
 (import chicken scheme)
 (require-library posix lolevel srfi-4)
 (import extras posix srfi-4 foreign lolevel ports)
+
+
 
 (include "backward-compatibility.scm")
 
