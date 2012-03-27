@@ -3,5 +3,5 @@
  (license "BSD")
  (category net)
  (author "David Krentzlin")
- (test-depends test simple-sha1)
+ (test-depends test simple-sha1 tcp-server)
  (synopsis "Sending a file over the network"))
