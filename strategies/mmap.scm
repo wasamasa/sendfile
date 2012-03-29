@@ -19,6 +19,7 @@
   (set!  *last-selected-implementation* 'mmapped)
   (chunk-for-each (cut send-chunk dst <> <> <>) src offset bytes))
 
+
 ;; map the bytes starting at offset and ending at offset+bytes
 ;; into memory, by mapping %current-chunk-size bytes at a time
 (define (chunk-for-each proc src offset bytes)
@@ -52,7 +53,7 @@
                  (mem-file   (map-file-to-memory #f chunk-size prot/read map/shared src (or mmap-offset offset)))
                  (pointer    (memory-mapped-file-pointer mem-file)))
             (if ptr-offset
-                (proc (pointer-offset pointer ptr-offset) chunk-size write-timeout)
+                (proc (pointer-inc pointer ptr-offset) chunk-size write-timeout)
                 (proc pointer chunk-size write-timeout))
             (unmap-file-from-memory mem-file)
             (loop (+ offset chunk-size) (+ bytes-written chunk-size) #f #f))))))
@@ -61,7 +62,7 @@
   ;;don't bother advices for data smaller than 64k
   (when (>= size (kilobytes 64)) (%madvise ptr size %madvise-will-need))
   ;(printf "Shall writ: ~A bytes starting at: ~A" size ptr )
-  (let loop ((bytes-left size) (work-ptr (pointer-offset ptr 0)))
+  (let loop ((bytes-left size) (work-ptr (pointer-inc ptr 0)))
     (if (zero? bytes-left)
         #t
         (let ((result (sys:write dst work-ptr bytes-left)))
@@ -79,5 +80,5 @@
            ((negative? result)
             (complain #f "write failed"))
            (else
-            (loop (- bytes-left result) (pointer-offset work-ptr result))))))))
+            (loop (- bytes-left result) (pointer-inc work-ptr result))))))))
 

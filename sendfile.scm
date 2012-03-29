@@ -38,12 +38,14 @@
  implementation-selector impl:mmapped impl:sendfile impl:read-write-loop/fd
  impl:read-write-loop/port mmap-available sendfile-available sendfile)
 (import chicken scheme)
-(require-library posix lolevel srfi-4)
-(import extras posix srfi-4 foreign lolevel ports)
+(import-for-syntax chicken)
+(require-library posix lolevel srfi-4 data-structures)
+(import extras posix srfi-4 foreign lolevel ports (only data-structures alist-ref))
 
 
 
 (include "backward-compatibility.scm")
+(include "backward-compatibility/pointer-offset.scm")
 
 (define (kilobytes num)  (* num 1024))
 (define (megabytes num)  (* (kilobytes num) 1024))

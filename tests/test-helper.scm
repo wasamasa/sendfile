@@ -33,11 +33,14 @@
 ;; until we reach eof-object
 
 ;; Use it like so:
-;; (call-with-connection-to-server (lambda (i o) (display "4" o) (newline o) (display "aaaa" o) (read-line i)))
+;; (call-with-connection-to-server (lambda (i o) (display "4" o) (newline
+;; o) (display "aaaa" o) (read-line i)))
+
+
 (define (handle-request input output)
   (handle-exceptions exn
       (begin (display "Error" output)
-             (display (get-condition-property exn 'exn 'msg) output)
+             (display (get-condition-property exn 'exn 'msg "Unknown") output)
              (newline output))
     (let* ((header (read-line input)))
       (unless (eof-object? header)
