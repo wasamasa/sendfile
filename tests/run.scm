@@ -101,25 +101,27 @@
         
         (test-chunking "read-write-port")))
 
-   (test-group "bugs"               
-               (call-with-buffer/checksum
-                (kibibytes 1)
-                (lambda (buffer checksum)
-                  (test "custom input port without fd [bug #542]"
-                        checksum
-                        (call-with-connection-to-server
-                         (lambda (server-in server-out)
-                           (write-content-size server-out (kibibytes 1))
-                           (sendfile (open-input-string buffer) server-out)
-                           (read-checksum server-in))))))
-   
-    
-               (call-with-temporary-file/checksum
-                (generate-buffer (mebibytes 2))
-                (lambda (temp-file expected-checksum)
-                  (test "send files > 1 mebibyte"
-                        expected-checksum
-                        (stream-file temp-file sendfile)))))))
+;   (test-group "bugs"               
+;               (call-with-buffer/checksum
+;                (kibibytes 1)
+;                (lambda (buffer checksum)
+;                  (test "custom input port without fd [bug #542]"
+;                        checksum
+;                        (call-with-connection-to-server
+;                         (lambda (server-in server-out)
+;                           (write-content-size server-out (kibibytes 1))
+;                           (sendfile (open-input-string buffer) server-out)
+;                           (read-checksum server-in))))))
+;   
+;    
+;               (call-with-temporary-file/checksum
+;                (generate-buffer (mebibytes 2))
+;                (lambda (temp-file expected-checksum)
+;                  (test "send files > 1 mebibyte"
+;                        expected-checksum
+;                        (stream-file temp-file sendfile)))))))
+))
+
 
 (unless (zero? (test-failure-count)) (exit 1))
 
