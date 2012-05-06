@@ -46,7 +46,7 @@
     (let* ((header (read-line input)))
       (unless (eof-object? header)
         (let* ((bytes-following (string->number header))
-               (content (read-string (if (positive? bytes-following) bytes-following #f) input)))
+               (content (read-string (and (positive? bytes-following) bytes-following) input)))
           (display (buffer-checksum content) output)
           (newline output)
           (flush-output output))))))
@@ -92,7 +92,7 @@
 
 ;; access the running server
 (define (call-with-connection-to-server proc)
-  (parameterize ((tcp-read-timeout 60000))
+  (parameterize ((tcp-read-timeout 30000))
     (receive (input output) (tcp-connect "localhost" (server-port))
       (let ((result (proc input output)))
         (close-input-port input)
@@ -108,13 +108,14 @@
        (write-content-size server-output size)
        
        (streamer file-port server-output)
-       
-       (flush-output server-output)
+      
+       (close-output-port server-output)
        (read-checksum server-input)))))
 
 (define (write-content-size port size)
   (display size port)
-  (newline port))
+  (newline port)
+  (flush-output port))
 
 (define (read-checksum port)
   (read-line port))
