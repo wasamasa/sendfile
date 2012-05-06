@@ -41,7 +41,8 @@
   (handle-exceptions exn
       (begin (display "Error" output)
              (display (get-condition-property exn 'exn 'msg "Unknown") output)
-             (newline output))
+             (newline output)
+             (flush-output output))
     (let* ((header (read-line input)))
       (unless (eof-object? header)
         (let* ((bytes-following (string->number header))
@@ -91,7 +92,7 @@
 
 ;; access the running server
 (define (call-with-connection-to-server proc)
-  (parameterize ((tcp-read-timeout 30000))
+  (parameterize ((tcp-read-timeout 60000))
     (receive (input output) (tcp-connect "localhost" (server-port))
       (let ((result (proc input output)))
         (close-input-port input)
