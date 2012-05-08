@@ -123,6 +123,5 @@
                        expected-checksum
                        (stream-file temp-file sendfile)))))))
 
-
-(unless (zero? (test-failure-count)) (exit 1))
+(test-exit)
 

@@ -1,7 +1,7 @@
 ;; 
 ;; %%HEADER%%
 ;;
-(use simple-sha1 tcp-server srfi-69 posix srfi-4)
+(use simple-sha1 tcp-server srfi-69 posix srfi-4 trace)
 
 (define (notify fmt . args)
   (apply printf fmt args)
@@ -21,10 +21,15 @@
   (let ((listener (tcp-listen (server-port))))
     (let loop ()
       (receive (input output) (tcp-accept listener)
-        (handle-request input output)
-        (close-input-port input)
-        (close-output-port output))
-      (loop))))
+          (let ((finish-request (lambda (_)
+                                  (close-input-port input)
+                                  (close-output-port output)
+                                  (exit 0))))
+            (set-signal-handler! signal/term finish-request)
+            (handle-request input output)
+            (close-input-port input)
+            (close-output-port output))
+          (loop)))))
 
 ;; the handler reads the input and writes back the checksum of
 ;; the data received.
@@ -37,19 +42,27 @@
 ;; o) (display "aaaa" o) (read-line i)))
 
 
+
+
 (define (handle-request input output)
   (handle-exceptions exn
-      (begin (display "Error" output)
-             (display (get-condition-property exn 'exn 'msg "Unknown") output)
-             (newline output)
-             (flush-output output))
-    (let* ((header (read-line input)))
-      (unless (eof-object? header)
-        (let* ((bytes-following (string->number header))
-               (content (read-string (and (positive? bytes-following) bytes-following) input)))
-          (display (buffer-checksum content) output)
-          (newline output)
-          (flush-output output))))))
+                     (begin (display "Error" output)
+                            (notify "ERROR~%")
+                            (display (get-condition-property exn 'exn 'msg "Unknown") output)
+                            (newline output)
+                            (flush-output output))
+      (let* ((header (read-line input)))
+        (notify "SERVER: new connection~%")
+        (unless (eof-object? header)
+          (notify "SERVER: received size-header: ~A bytes ~%" header)
+          (let* ((bytes-following (string->number header))
+                 (content (read-string (and (positive? bytes-following) bytes-following) input))
+                 (checksum (buffer-checksum content)))
+            (notify "SERVER: read content successfully~%")
+            (fprintf output "~A~%" checksum)
+            (notify "SERVER: answered with checksum: ~A~%" checksum))))))
+
+
 
 (define (start-server #!key (fork #t))
   (if fork (fork-server) (server)))
@@ -106,11 +119,14 @@
     (call-with-connection-to-server
      (lambda (server-input server-output)
        (write-content-size server-output size)
-       
+       (notify "STREAM-FILE: Wrote size-header: ~A bytes ~%" size)
        (streamer file-port server-output)
-      
+       (notify "STREAM-FILE: Streamed data~%")
        (close-output-port server-output)
-       (read-checksum server-input)))))
+       (notify "STREAM-FILE: Reading checksum from server ~%")
+       (let ((chksm (read-checksum server-input)))
+         (notify "STREAM-FILE: Received checksum ~A~%" chksm)
+         chksm)))))
 
 (define (write-content-size port size)
   (display size port)
