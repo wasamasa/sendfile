@@ -1,7 +1,7 @@
 ;; 
 ;; %%HEADER%%
 ;;
-(use simple-sha1 tcp-server srfi-69 posix srfi-4 trace)
+(use simple-sha1 tcp-server srfi-69 posix srfi-4)
 
 (define (notify fmt . args)
   (apply printf fmt args)
