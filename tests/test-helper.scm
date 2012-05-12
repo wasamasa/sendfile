@@ -52,15 +52,16 @@
                             (newline output)
                             (flush-output output))
       (let* ((header (read-line input)))
-        (notify "SERVER: new connection~%")
+        ;(notify "SERVER: new connection~%")
         (unless (eof-object? header)
-          (notify "SERVER: received size-header: ~A bytes ~%" header)
+          ;(notify "SERVER: received size-header: ~A bytes ~%" header)
           (let* ((bytes-following (string->number header))
                  (content (read-string (and (positive? bytes-following) bytes-following) input))
                  (checksum (buffer-checksum content)))
-            (notify "SERVER: read content successfully~%")
+      ;      (notify "SERVER: read content successfully~%")
             (fprintf output "~A~%" checksum)
-            (notify "SERVER: answered with checksum: ~A~%" checksum))))))
+      ;      (notify "SERVER: answered with checksum: ~A~%" checksum)
+)))))
 
 
 
@@ -119,13 +120,13 @@
     (call-with-connection-to-server
      (lambda (server-input server-output)
        (write-content-size server-output size)
-       (notify "STREAM-FILE: Wrote size-header: ~A bytes ~%" size)
+       ;(notify "STREAM-FILE: Wrote size-header: ~A bytes ~%" size)
        (streamer file-port server-output)
-       (notify "STREAM-FILE: Streamed data~%")
+       ;(notify "STREAM-FILE: Streamed data~%")
        (close-output-port server-output)
-       (notify "STREAM-FILE: Reading checksum from server ~%")
+       ;(notify "STREAM-FILE: Reading checksum from server ~%")
        (let ((chksm (read-checksum server-input)))
-         (notify "STREAM-FILE: Received checksum ~A~%" chksm)
+       ;  (notify "STREAM-FILE: Received checksum ~A~%" chksm)
          chksm)))))
 
 (define (write-content-size port size)
