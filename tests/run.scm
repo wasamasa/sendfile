@@ -6,6 +6,8 @@
 (load "test-helper")
 (use sendfile)
 
+(test-begin "sendfile")
+
 (with-running-server
 
  (let* ((mb-buffer (generate-buffer (mebibytes 1)))
@@ -122,6 +124,8 @@
                  (test "send files > 1 mebibyte"
                        expected-checksum
                        (stream-file temp-file sendfile)))))))
+
+(test-end "sendfile")
 
 (test-exit)
 
