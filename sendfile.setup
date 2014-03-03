@@ -113,6 +113,6 @@ CODE
   (install-extension 
     'sendfile
     '("sendfile.so" "sendfile.import.so" "sendfile-static.o")
-    '((version "1.7.24")
+    '((version "1.7.25")
      (static "sendfile-static.o")
      (documentation "sendfile.html"))))
