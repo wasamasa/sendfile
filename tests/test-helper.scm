@@ -1,4 +1,4 @@
-;; 
+;;
 ;; %%HEADER%%
 ;;
 (use simple-sha1 tcp-server srfi-69 posix srfi-4)
@@ -31,6 +31,9 @@
             (close-output-port output))
           (loop)))))
 
+(define (extract-error-message exn)
+  (string-trim-both (with-output-to-string (lambda () (print-error-message exn))) #\newline))
+
 ;; the handler reads the input and writes back the checksum of
 ;; the data received.
 ;; Important: the implementation expected the bytes to receive to be
@@ -41,17 +44,13 @@
 ;; (call-with-connection-to-server (lambda (i o) (display "4" o) (newline
 ;; o) (display "aaaa" o) (read-line i)))
 
-
-
-
 (define (handle-request input output)
   (handle-exceptions exn
-                     (begin (display "Error" output)
-                            (notify "ERROR~%")
-                            (display (get-condition-property exn 'exn 'msg "Unknown") output)
-                            (newline output)
-                            (flush-output output))
-      (let* ((header (read-line input)))
+                     (let ((error-message (extract-error-message exn)))
+                       (fprintf (current-error-port) "~a~%" error-message)
+                       (fprintf output "~a~%" error-message)
+                       (flush-output output))
+     (let* ((header (read-line input)))
         ;(notify "SERVER: new connection~%")
         (unless (eof-object? header)
           ;(notify "SERVER: received size-header: ~A bytes ~%" header)
@@ -109,8 +108,11 @@
   (parameterize ((tcp-read-timeout 30000))
     (receive (input output) (tcp-connect "localhost" (server-port))
       (let ((result (proc input output)))
-        (close-input-port input)
-        (close-output-port output)
+        ;; if an error accured the server might have gone down
+        (handle-exceptions exn
+                           (fprintf (current-error-port "~a~%" (extract-error-message exn)))
+         (close-input-port input)
+         (close-output-port output))
         result))))
 
 

@@ -1,6 +1,6 @@
-;; 
+;;
 ;; %%HEADER%%
-;; 
+;;
 
 (use test)
 (load "test-helper")
@@ -18,12 +18,12 @@
       mb-buffer
       (lambda (temp-file _)
         (stream-file temp-file sendfile))))
- 
+
    (test-group "sendfile main interface"
                (test "sendfile" mb-checksum (stream-mb-buffer)))
 
    (test-group "forcing implementation"
-               
+
                (parameterize ((force-implementation 'read-write))
                  (test "read-write" mb-checksum (stream-mb-buffer)))
 
@@ -40,7 +40,7 @@
 
 
    (test-group "read-write variations"
-               
+
                (call-with-temporary-file/checksum
                 (generate-buffer (mebibytes 1))
                 (lambda (temp-file expected-checksum)
@@ -55,15 +55,14 @@
                            (close-output-port server-out)
                            (read-checksum server-in)))))))
 
-
    (test-group "content chunking"
-               
+
       (let* ((head   (generate-buffer 20 #\a))
              (middle (generate-buffer 20 #\b))
              (tail   (generate-buffer 20 #\c))
-             (buffer (string-append head middle tail)))         
+             (buffer (string-append head middle tail)))
 
-        (define (chunking-test proc) 
+        (define (chunking-test proc)
          (call-with-connection-to-server
           (lambda (server-in server-out)
             (let ((input (open-input-string buffer)))
@@ -76,7 +75,7 @@
           (syntax-rules ()
             ((_ implementation)
              (test-group implementation
-               (parameterize ((force-implementation (string->symbol implementation)))          
+               (parameterize ((force-implementation (string->symbol implementation)))
                  (test "offsets"
                        (buffer-checksum tail)
                        (chunking-test
@@ -87,13 +86,13 @@
                        (chunking-test
                         (lambda (input output)
                           (sendfile input output bytes: 20))))
-             
+
                  (test "size and offset"
                        (buffer-checksum middle)
                        (chunking-test
                         (lambda (input output)
                           (sendfile input output offset: 20 bytes: 20)))))))))
-        
+
         (when sendfile-available
           (test-chunking "sendfile"))
 
@@ -101,10 +100,10 @@
           (test-chunking "mmapped"))
 
         (test-chunking "read-write")
-        
+
         (test-chunking "read-write-port")))
 
-  (test-group "bugs"               
+  (test-group "bugs"
               (call-with-buffer/checksum
                (kibibytes 1)
                (lambda (buffer checksum)
@@ -116,8 +115,8 @@
                           (sendfile (open-input-string buffer) server-out)
                           (close-output-port server-out)
                           (read-checksum server-in))))))
-  
-   
+
+
               (call-with-temporary-file/checksum
                (generate-buffer (mebibytes 2))
                (lambda (temp-file expected-checksum)
@@ -128,4 +127,3 @@
 (test-end "sendfile")
 
 (test-exit)
-
