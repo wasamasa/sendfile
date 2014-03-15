@@ -57,15 +57,12 @@
 
 (define write-timeout (make-parameter #f))
 
-
 ;;the buffer used in read write loops
 ;;the client may adjust this to meet its need
 (define read-write-buffer-size (make-parameter %bufsize))
 
 ;;the current chunk-size specifies how big the slices are that
-;;we read/write in the three scenarios. This is parameterized
-;;because different methods to send the file may work better with
-;;differently sized chunks.
+;;we read/write in the three scenarios.
 ;; We've chosen 64k for two reasons:
 ;; 1) as chicken does not have native threads, a smaller chunksize
 ;;    means a shorter period of time that the thread blocks.
@@ -175,27 +172,27 @@
   (sendfile
    (define (impl:sendfile src dst offset bytes)
      (set!  *last-selected-implementation* 'sendfile)
-
-     (let loop ((offset offset) (target-offset (+ offset bytes)))
-       (if (= offset  target-offset)
-           bytes
-           (let* ((next-chunk (next-chunk-size offset (+ offset bytes)))
-                  (new-offset (%sendfile-implementation src dst offset next-chunk)))
-             (cond
-              ((eqv? -2.0 new-offset)   ; EAGAIN/EINTR
-               (when (write-timeout)
-                 (##sys#thread-block-for-timeout!
-                  ##sys#current-thread
-                  (+ (current-milliseconds) (write-timeout))))
-               (##sys#thread-block-for-i/o! ##sys#current-thread dst #:output)
-               (%yield)
-               (when (##sys#slot ##sys#current-thread 13)
-                 (complain #f "write operation timed out"))
-               (loop offset target-offset))
-              ((negative? new-offset)
-               (complain #t "sendfile failed"))
-              (else
-               (loop new-offset target-offset))))))))
+     (let ((write-timeout (write-timeout)))
+       (let loop ((offset offset) (target-offset (+ offset bytes)))
+         (if (= offset  target-offset)
+             bytes
+             (let* ((next-chunk (next-chunk-size offset (+ offset bytes)))
+                    (new-offset (%sendfile-implementation src dst offset next-chunk)))
+               (cond
+                ((eqv? -2.0 new-offset)   ; EAGAIN/EINTR
+                 (when write-timeout
+                   (##sys#thread-block-for-timeout!
+                    ##sys#current-thread
+                    (+ (current-milliseconds) write-timeout)))
+                 (##sys#thread-block-for-i/o! ##sys#current-thread dst #:output)
+                 (%yield)
+                 (when (##sys#slot ##sys#current-thread 13)
+                   (complain #f "write operation timed out"))
+                 (loop offset target-offset))
+                ((negative? new-offset)
+                 (complain #t "sendfile failed"))
+                (else
+                 (loop new-offset target-offset)))))))))
   (else
    (define (impl:sendfile . args)
      (complain #f "Sendfile is not available on your system"))))
