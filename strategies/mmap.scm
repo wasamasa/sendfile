@@ -21,7 +21,7 @@
 
 
 ;; map the bytes starting at offset and ending at offset+bytes
-;; into memory, by mapping %current-chunk-size bytes at a time
+;; into memory, by mapping +current-chunk-size+ bytes at a time
 (define (chunk-for-each proc src offset bytes)
   (let ((page-size sys:page-size)
         (mmap-offset offset)
@@ -30,7 +30,7 @@
         (target-offset (+ offset bytes))
         (write-timeout (write-timeout)))
     ;(printf "~%1 mmap-offset: ~A ptr-offset: ~A offset: ~A target-offset: ~A ~%" mmap-offset ptr-offset offset target-offset)
-    
+
     ;; ensure page-alignment
     (when (positive? offset)
       (cond
@@ -42,7 +42,7 @@
        (else
         (set! ptr-offset offset)
         (set! mmap-offset 0))))
-    
+
     ;(printf "2 mmap-offset: ~A ptr-offset: ~A offset: ~A target-offset: ~A ~%" mmap-offset ptr-offset offset target-offset)
 
     (let loop ((offset offset) (bytes-written 0) (mmap-offset mmap-offset) (ptr-offset ptr-offset))
@@ -81,4 +81,3 @@
             (complain #f "write failed"))
            (else
             (loop (- bytes-left result) (pointer-inc work-ptr result))))))))
-
