@@ -4,7 +4,7 @@
 
 (define (impl:read-write-loop/port-both src dst offset bytes)
   (set!  *last-selected-implementation* 'read-write-loop)
-  
+
   (when (positive? offset)
     (port-seek src offset))
 
@@ -33,14 +33,14 @@
 
 (define (impl:read-write-loop/port src dst offset bytes)
   (set!  *last-selected-implementation* 'read-write-loop)
-  
+
   (let* ((buffsize (read-write-buffer-size))
          (buffer (make-string buffsize))
          (seek (foreign-lambda int "lseek" integer integer int)))
-    
+
     (when (positive? offset)
       (sys-seek src offset seek-set))
-    
+
     (let loop ((bytes-left bytes) (bytes-read 0))
       (if (not (positive? bytes-left))
           bytes-read
@@ -55,7 +55,7 @@
 
 (define (impl:read-write-loop/fd src dst offset bytes)
   (set!  *last-selected-implementation* 'read-write-loop)
-  
+
   (let* ((buffsize (read-write-buffer-size))
          (buffer (make-string buffsize))
          (write-timeout (write-timeout))
@@ -82,7 +82,7 @@
                                (else (loop (fx- bytes-left written-bytes) (fx+ write_offset written-bytes))))))))))
     (when (positive? offset)
       (sys-seek src offset seek-set))
-    
+
     (let loop ((bytes-left bytes) (bytes-read 0))
       (if (not (positive? bytes-left))
           bytes-read
