@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Sendfile Egg for the Chicken Scheme system.
-;;              
+;;
 ;; This eggs provides a capability to utilize
 ;; the sendfile system-call. However it is
 ;; not a mere wrapper to call this function if
@@ -10,7 +10,7 @@
 ;;
 ;; Please report bugs to <http://trac.callcc.org/>
 ;;
-;; Copyright (c) 2007 David Krentzlin 
+;; Copyright (c) 2007 David Krentzlin
 ;;
 ;; Permission is hereby granted, free of charge, to any person obtaining a
 ;; copy of this software and associated documentation files (the "Software"),
@@ -21,7 +21,7 @@
 ;;
 ;; The above copyright notice and this permission notice shall be included
 ;; in all copies or substantial portions of the Software.
-;; 
+;;
 ;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 ;; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 ;; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -29,7 +29,7 @@
 ;; OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ;; ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 ;; OTHER DEALINGS IN THE SOFTWARE.
-;; 
+;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (foreign-declare "#define _XOPEN_SOURCE 600")
 
@@ -68,19 +68,19 @@
 ;;differently sized chunks.
 ;; We've chosen 64k for two reasons:
 ;; 1) as chicken does not have native threads, a smaller chunksize
-;;    means a shorter period of time that the thread blocks. 
+;;    means a shorter period of time that the thread blocks.
 ;; 2) it is half the typical max readahead size in Linux 2.6, giving the
 ;;    kernel some time to populate the page cache in between
 ;;    subsequent sendfile() calls.
-(define %current-chunk-size (make-parameter (kilobytes 64)))
+(define +current-chunk-size+ (kilobytes 64))
 
 ;;compute the next chunk to send out of offset and the length
 ;;of the remaining buffer. This is really just a convenience-procedure
-;;that uses (the possibly parameterized) (chunk-size)
+;;that uses current-chunk-size
 
 (define (next-chunk-size current-offset target-offset)
   (let ((distance (- target-offset current-offset)))
-    (if (> distance (%current-chunk-size)) (%current-chunk-size) distance)))
+    (if (> distance +current-chunk-size+) +current-chunk-size+ distance)))
 
 
 ;; yield control to other threads so that
@@ -175,7 +175,7 @@
   (sendfile
    (define (impl:sendfile src dst offset bytes)
      (set!  *last-selected-implementation* 'sendfile)
-     
+
      (let loop ((offset offset) (target-offset (+ offset bytes)))
        (if (= offset  target-offset)
            bytes
@@ -260,7 +260,7 @@
       (let* ((source  (->fileno source))
              (size (file-size source))
              (len (or bytes-to-send (- size offset))))
-        
+
         (ensure-sane-offset/bytes size offset bytes-to-send)
         (impl:read-write-loop/port source target offset len))))
 
@@ -288,5 +288,3 @@
           (else
            (complain #f "invalid implementation forced. Allowed values are (sendfile mmapped read-write read-write-port nothing)"))))))
 )
-
-
