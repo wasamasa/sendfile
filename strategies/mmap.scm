@@ -28,7 +28,8 @@
         (ptr-offset #f)
         (offset offset)
         (target-offset (+ offset bytes))
-        (write-timeout (write-timeout)))
+        (write-timeout (write-timeout))
+        (wanted-chunk-size (%current-chunk-size)))
     ;(printf "~%1 mmap-offset: ~A ptr-offset: ~A offset: ~A target-offset: ~A ~%" mmap-offset ptr-offset offset target-offset)
 
     ;; ensure page-alignment
@@ -49,7 +50,7 @@
       (if (= offset target-offset)
           bytes-written
           ;;now map chunks until we have mapped the data we wanted
-          (let* ((chunk-size (next-chunk-size (or ptr-offset offset) target-offset))
+          (let* ((chunk-size (next-chunk-size (or ptr-offset offset) target-offset wanted-chunk-size))
                  (mem-file   (map-file-to-memory #f chunk-size prot/read map/shared src (or mmap-offset offset)))
                  (pointer    (memory-mapped-file-pointer mem-file)))
             (if ptr-offset

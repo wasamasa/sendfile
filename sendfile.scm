@@ -69,15 +69,15 @@
 ;; 2) it is half the typical max readahead size in Linux 2.6, giving the
 ;;    kernel some time to populate the page cache in between
 ;;    subsequent sendfile() calls.
-(define +current-chunk-size+ (kilobytes 64))
+(define %current-chunk-size (make-parameter (kilobytes 64)))
 
 ;;compute the next chunk to send out of offset and the length
 ;;of the remaining buffer. This is really just a convenience-procedure
 ;;that uses current-chunk-size
 
-(define (next-chunk-size current-offset target-offset)
+(define (next-chunk-size current-offset target-offset wanted-chunk-size)
   (let ((distance (- target-offset current-offset)))
-    (if (> distance +current-chunk-size+) +current-chunk-size+ distance)))
+    (if (> distance wanted-chunk-size) wanted-chunk-size distance)))
 
 
 ;; yield control to other threads so that
@@ -172,11 +172,12 @@
   (sendfile
    (define (impl:sendfile src dst offset bytes)
      (set!  *last-selected-implementation* 'sendfile)
-     (let ((write-timeout (write-timeout)))
+     (let ((write-timeout (write-timeout))
+           (wanted-chunk-size (%current-chunk-size)))
        (let loop ((offset offset) (target-offset (+ offset bytes)))
          (if (= offset  target-offset)
              bytes
-             (let* ((next-chunk (next-chunk-size offset (+ offset bytes)))
+             (let* ((next-chunk (next-chunk-size offset (+ offset bytes) wanted-chunk-size))
                     (new-offset (%sendfile-implementation src dst offset next-chunk)))
                (cond
                 ((eqv? -2.0 new-offset)   ; EAGAIN/EINTR
