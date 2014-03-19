@@ -36,7 +36,7 @@
 (module sendfile
 (force-implementation *last-selected-implementation* read-write-buffer-size
  implementation-selector impl:mmapped impl:sendfile impl:read-write-loop/fd
- impl:read-write-loop/port mmap-available sendfile-available sendfile)
+ impl:read-write-loop/port mmap-available sendfile-available sendfile %current-chunk-size)
 (import chicken scheme)
 (import-for-syntax chicken)
 (require-library posix lolevel srfi-4 data-structures)
