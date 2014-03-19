@@ -1,0 +1,28 @@
+
+File: test-file.100m
+======================================
+Runtimes(sendfile): 	((max . 98238.986000061) (min . 95661.1909999847) (avg . 96726.17120018) (runtimes 98238.986000061 95661.1909999847 96315.6510000229 97539.7430000305 95875.2850008011) (values #<unspecified> #<unspecified> #<unspecified> #<unspecified> #<unspecified>))
+Runtimes(  rw): 	((max . 99000.2969999313) (min . 96761.470000267) (avg . 98168.0882001877) (runtimes 98494.0820007324 96761.470000267 99000.2969999313 97918.4569997787 98666.1350002289) (values #<unspecified> #<unspecified> #<unspecified> #<unspecified> #<unspecified>))
+Runtimes( rwp): 	((max . 210957.574000359) (min . 199574.793000221) (avg . 203807.858800125) (runtimes 210957.574000359 201394.416000366 202393.472999573 199574.793000221 204719.038000107) (values #<unspecified> #<unspecified> #<unspecified> #<unspecified> #<unspecified>))
+Runtimes(mmap): 	((max . 105002.430000305) (min . 101239.246999741) (avg . 103392.724600029) (runtimes 104121.529000282 105002.430000305 101239.246999741 103349.770000458 103250.646999359) (values #<unspecified> #<unspecified> #<unspecified> #<unspecified> #<unspecified>))
+
+File: test-file.500m
+======================================
+Runtimes(sendfile): 	((max . 503165.173000336) (min . 489547.36700058) (avg . 495832.941600037) (runtimes 503165.173000336 489547.36700058 496505.240999222 492915.116999626 497031.81000042) (values #<unspecified> #<unspecified> #<unspecified> #<unspecified> #<unspecified>))
+Runtimes(  rw): 	((max . 502714.631000519) (min . 487086.895999908) (avg . 494111.862800217) (runtimes 487145.586999893 497062.076000214 502714.631000519 496550.124000549 487086.895999908) (values #<unspecified> #<unspecified> #<unspecified> #<unspecified> #<unspecified>))
+Runtimes( rwp): 	((max . 1024473.25599957) (min . 1015868.48400021) (avg . 1019734.74080009) (runtimes 1015868.48400021 1017967.86500072 1021406.19099998 1018957.90799999 1024473.25599957) (values #<unspecified> #<unspecified> #<unspecified> #<unspecified> #<unspecified>))
+Runtimes(mmap): 	((max . 528495.87100029) (min . 504862.611000061) (avg . 514277.656400299) (runtimes 504862.611000061 508416.641000748 513476.123000145 528495.87100029 516137.036000252) (values #<unspecified> #<unspecified> #<unspecified> #<unspecified> #<unspecified>))
+
+File: test-file.700m
+======================================
+Runtimes(sendfile): 	((max . 688264.907000542) (min . 674785.893000603) (avg . 681221.585400391) (runtimes 678691.357999802 686359.591000557 678006.17800045 688264.907000542 674785.893000603) (values #<unspecified> #<unspecified> #<unspecified> #<unspecified> #<unspecified>))
+Runtimes(  rw): 	((max . 699712.229999542) (min . 680362.799999237) (avg . 687884.783199882) (runtimes 680362.799999237 688966.230999947 688731.010000229 681651.645000458 699712.229999542) (values #<unspecified> #<unspecified> #<unspecified> #<unspecified> #<unspecified>))
+Runtimes( rwp): 	((max . 1450015.86700058) (min . 1436027.6970005) (avg . 1445406.87800007) (runtimes 1446820.18499947 1447870.46299934 1450015.86700058 1436027.6970005 1446300.17800045) (values #<unspecified> #<unspecified> #<unspecified> #<unspecified> #<unspecified>))
+Runtimes(mmap): 	((max . 738703.589999199) (min . 725750.69699955) (avg . 732135.603199577) (runtimes 725750.69699955 734896.634999275 732192.579999924 738703.589999199 729134.513999939) (values #<unspecified> #<unspecified> #<unspecified> #<unspecified> #<unspecified>))
+
+File: test-file.1g
+======================================
+Runtimes(sendfile): 	((max . 1017437.47799969) (min . 1005207.35900021) (avg . 1010838.91240005) (runtimes 1010709.34700012 1008991.95300007 1017437.47799969 1011848.42500019 1005207.35900021) (values #<unspecified> #<unspecified> #<unspecified> #<unspecified> #<unspecified>))
+Runtimes(  rw): 	((max . 1032243.80600071) (min . 999293.690000534) (avg . 1014019.72840023) (runtimes 1008074.09700012 999293.690000534 1017887.68900013 1032243.80600071 1012599.35999966) (values #<unspecified> #<unspecified> #<unspecified> #<unspecified> #<unspecified>))
+Runtimes( rwp): 	((max . 2128412.00399971) (min . 2106598.02200031) (avg . 2114320.43780022) (runtimes 2128412.00399971 2111320.14000034 2107947.18200016 2117324.84100056 2106598.02200031) (values #<unspecified> #<unspecified> #<unspecified> #<unspecified> #<unspecified>))
+Runtimes(mmap): 	((max . 1076915.24100018) (min . 1039773.92300034) (avg . 1056646.65620022) (runtimes 1076915.24100018 1051914.86700058 1039773.92300034 1047388.07299995 1067241.17700005) (values #<unspecified> #<unspecified> #<unspecified> #<unspecified> #<unspecified>))
