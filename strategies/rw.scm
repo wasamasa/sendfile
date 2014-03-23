@@ -44,10 +44,9 @@
     (let loop ((bytes-left bytes) (bytes-read 0))
       (if (not (positive? bytes-left))
           bytes-read
-          (let* ((to-read (fxmin buffsize (inexact->exact bytes-left)))
+          (let* ((to-read (fxmin buffsize (inexact->exact bytes-left))) ;; is that ok? doesn't that possibly overflow?
                  (read-bytes (cadr (file-read src to-read buffer))))
-;            (printf "Now writing ~A~%" (substring buffer 0 read-bytes))
-            (display (substring buffer 0 read-bytes) dst)
+            (write-string buffer read-bytes dst)
             (loop (- bytes-left read-bytes) (+ bytes-read read-bytes)))))))
 
 

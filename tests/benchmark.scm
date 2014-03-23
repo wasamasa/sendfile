@@ -23,7 +23,7 @@
        ;(notify "STREAM-FILE: Reading checksum from server ~%")
        (void)))))
 
-(let ((runs 1)
+(let ((runs 5)
       (files '("test-file.100m" "test-file.500m" "test-file.700m" "test-file.1g")))
 
   (define (stream-file* file method)
