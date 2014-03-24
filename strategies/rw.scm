@@ -35,7 +35,7 @@
   (set!  *last-selected-implementation* 'read-write-loop)
 
   (let* ((buffsize (read-write-buffer-size))
-         (buffer (make-string buffsize))
+         (buffer   (make-string buffsize))
          (seek (foreign-lambda int "lseek" integer integer int)))
 
     (when (positive? offset)
@@ -44,7 +44,7 @@
     (let loop ((bytes-left bytes) (bytes-read 0))
       (if (not (positive? bytes-left))
           bytes-read
-          (let* ((to-read (fxmin buffsize (inexact->exact bytes-left))) ;; is that ok? doesn't that possibly overflow?
+          (let* ((to-read    (fxmin buffsize (inexact->exact bytes-left))) ;; is that ok? doesn't that possibly overflow?
                  (read-bytes (cadr (file-read src to-read buffer))))
             (write-string buffer read-bytes dst)
             (loop (- bytes-left read-bytes) (+ bytes-read read-bytes)))))))
