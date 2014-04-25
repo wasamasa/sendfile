@@ -17,10 +17,15 @@
   (let ((p (get-environment-variable "SENDFILE_TEST_PORT")))
     (or (and p (string->number p)) 5555)))
 
+
 (define (server)
   (let ((listener (tcp-listen (server-port))))
     (let loop ()
       (receive (input output) (tcp-accept listener)
+        (handle-exceptions exn
+                           (let ((error-message (extract-error-message exn)))
+                             (fprintf (current-error-port) "~a~%" error-message))
+
           (let ((finish-request (lambda (_)
                                   (close-input-port input)
                                   (close-output-port output)
@@ -28,8 +33,8 @@
             (set-signal-handler! signal/term finish-request)
             (handle-request input output)
             (close-input-port input)
-            (close-output-port output))
-          (loop)))))
+            (close-output-port output)))
+        (loop)))))
 
 (define (extract-error-message exn)
   (string-trim-both (with-output-to-string (lambda () (print-error-message exn))) #\newline))
@@ -105,7 +110,7 @@
 
 ;; access the running server
 (define (call-with-connection-to-server proc)
-  (parameterize ((tcp-read-timeout 30000))
+  (parameterize ((tcp-read-timeout 300))
     (receive (input output) (tcp-connect "localhost" (server-port))
       (let ((result (proc input output)))
         ;; if an error accured the server might have gone down
