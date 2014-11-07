@@ -1,80 +1,86 @@
 (use posix)
 
 (define madvise-test #<<CODE
+#include <stdlib.h>
 #include "sys/mman.h"
 int main (){
   char *buff;
   madvise(buff,0,MADV_WILLNEED);
   return 0;
-}            
+}
 CODE
 )
 
 (define posix-fadvise-test #<<CODE
 #define _XOPEN_SOURCE 600
+#include <stdlib.h>
 #include <fcntl.h>
 int main(){
   int fake_fd = 0;
-  posix_fadvise(fake_fd,0,0,POSIX_FADV_SEQUENTIAL);    
+  posix_fadvise(fake_fd,0,0,POSIX_FADV_SEQUENTIAL);
   return posix_fadvise(fake_fd,0,0,POSIX_FADV_NOREUSE);
 }
 CODE
 )
 
 (define sendfile-bsd-test #<<CODE
+#include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/uio.h>
 int main(){
-  int src,dst;         
+  int src,dst;
   off_t offset,res;
-  return sendfile(src,dst,offset,0,NULL,&res,0);      
-}           
+  return sendfile(src,dst,offset,0,NULL,&res,0);
+}
 CODE
 )
 
 (define sendfile-macos-test #<<CODE
+#include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/uio.h>
 int main(){
-  int src,dst;         
+  int src,dst;
   off_t offset,res;
-  return sendfile(src,dst,offset,&res,0,0);      
-}           
+  return sendfile(src,dst,offset,&res,0,0);
+}
 CODE
 )
 
 (define sendfile-sun-test #<<CODE
+#include <stdlib.h>
 #include <sys/sendfile.h>
 int main(){
-  int dst;         
+  int dst;
   sendfilevec_t fvec;
-  size_t written;        
+  size_t written;
   return sendfile(dst,&fvec,1,&written);
 }
 CODE
 )
 
 (define sendfile-linux-test #<<CODE
+#include <stdlib.h>
 #include <sys/sendfile.h>
 int main(){
   int in,out;
-  off_t offset;     
+  off_t offset;
   return sendfile(in,out,&offset,0);
 }
 CODE
 )
 
 (define mmap-test #<<CODE
+#include <stdlib.h>
 #include <sys/mman.h>
 int main(){
-   int src;         
+   int src;
    return mmap(0, 100, PROT_READ | PROT_WRITE, MAP_SHARED,src, 0);
-}           
+}
 CODE
-)  
-
+)
 
 
 (define madvise? (try-compile madvise-test compile-only: #t))
@@ -82,9 +88,9 @@ CODE
 (define mmap? (try-compile mmap-test compile-only: #t))
 (define sendfile?
           (cond-expand
-          (linux   
+          (linux
            (try-compile sendfile-linux-test compile-only: #t))
-          ((or netbsd openbsd freebsd) 
+          ((or netbsd openbsd freebsd)
            (try-compile sendfile-bsd-test compile-only: #t))
           (macosx
            (try-compile sendfile-macos-test compile-only: #t))
@@ -110,7 +116,7 @@ CODE
   (compile -s -O2 -d0 ,@features sendfile.scm -j sendfile)
   (compile -s -O2 -d0 sendfile.import.scm)
   (compile -c -O2 -d0 ,@features sendfile.scm  -unit sendfile -o sendfile-static.o)
-  (install-extension 
+  (install-extension
     'sendfile
     '("sendfile.so" "sendfile.import.so" "sendfile-static.o")
     '((version "1.7.29")
