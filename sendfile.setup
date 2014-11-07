@@ -83,19 +83,19 @@ CODE
 )
 
 
-(define madvise? (try-compile madvise-test compile-only: #t))
-(define posix-fadvise? (try-compile posix-fadvise-test compile-only: #t))
-(define mmap? (try-compile mmap-test compile-only: #t))
+(define madvise? (try-compile madvise-test compile-only: #f))
+(define posix-fadvise? (try-compile posix-fadvise-test compile-only: #f))
+(define mmap? (try-compile mmap-test compile-only: #f))
 (define sendfile?
           (cond-expand
           (linux
-           (try-compile sendfile-linux-test compile-only: #t))
+           (try-compile sendfile-linux-test compile-only: #f))
           ((or netbsd openbsd freebsd)
-           (try-compile sendfile-bsd-test compile-only: #t))
+           (try-compile sendfile-bsd-test compile-only: #f))
           (macosx
-           (try-compile sendfile-macos-test compile-only: #t))
+           (try-compile sendfile-macos-test compile-only: #f))
           (sun
-           (try-compile sendfile-sun-test compile-only: #t))
+           (try-compile sendfile-sun-test compile-only: #f))
           (else #f)))
 
 ;; Compatibility with older chickens
