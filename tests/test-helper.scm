@@ -115,7 +115,7 @@
       (let ((result (proc input output)))
         ;; if an error accured the server might have gone down
         (handle-exceptions exn
-                           (fprintf (current-error-port "~a~%" (extract-error-message exn)))
+                           (fprintf (current-error-port) "~a~%" (extract-error-message exn))
          (close-input-port input)
          (close-output-port output))
         result))))
