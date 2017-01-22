@@ -31,7 +31,8 @@
 ;; OTHER DEALINGS IN THE SOFTWARE.
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(foreign-declare "#define _XOPEN_SOURCE 600")
+
+(foreign-declare "#ifndef _XOPEN_SOURCE\n#define _XOPEN_SOURCE 600\n#endif")
 
 (module sendfile
 (force-implementation *last-selected-implementation* read-write-buffer-size
