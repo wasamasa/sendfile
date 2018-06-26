@@ -1,87 +1,14 @@
+;; -*- scheme -*-
+
 (use posix)
 
-(define madvise-test #<<CODE
-#include <stdlib.h>
-#include "sys/mman.h"
-int main (){
-  char *buff;
-  madvise(buff,0,MADV_WILLNEED);
-  return 0;
-}
-CODE
-)
-
-(define posix-fadvise-test #<<CODE
-#define _XOPEN_SOURCE 600
-#include <stdlib.h>
-#include <fcntl.h>
-int main(){
-  int fake_fd = 0;
-  posix_fadvise(fake_fd,0,0,POSIX_FADV_SEQUENTIAL);
-  return posix_fadvise(fake_fd,0,0,POSIX_FADV_NOREUSE);
-}
-CODE
-)
-
-(define sendfile-bsd-test #<<CODE
-#include <stdlib.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <sys/uio.h>
-int main(){
-  int src,dst;
-  off_t offset,res;
-  return sendfile(src,dst,offset,0,NULL,&res,0);
-}
-CODE
-)
-
-(define sendfile-macos-test #<<CODE
-#include <stdlib.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <sys/uio.h>
-int main(){
-  int src,dst;
-  off_t offset,res;
-  return sendfile(src,dst,offset,&res,0,0);
-}
-CODE
-)
-
-(define sendfile-sun-test #<<CODE
-#include <stdlib.h>
-#include <sys/sendfile.h>
-int main(){
-  int dst;
-  sendfilevec_t fvec;
-  size_t written;
-  return sendfile(dst,&fvec,1,&written);
-}
-CODE
-)
-
-(define sendfile-linux-test #<<CODE
-#include <stdlib.h>
-#include <sys/sendfile.h>
-int main(){
-  int in,out;
-  off_t offset;
-  return sendfile(in,out,&offset,0);
-}
-CODE
-)
-
-(define mmap-test #<<CODE
-#include <stdlib.h>
-#include <sys/mman.h>
-int main(){
-   int src;
-   return mmap(0, 100, PROT_READ | PROT_WRITE, MAP_SHARED,src, 0);
-}
-CODE
-)
-
+(define madvise-test (read-all "feature-tests/madvise.c"))
+(define posix-fadvise-test (read-all "feature-tests/madvise.c"))
+(define sendfile-bsd-test (read-all "feature-tests/sendfile-bsd.c"))
+(define sendfile-macos-test (read-all "feature-tests/sendfile-macos.c"))
+(define sendfile-sun-test (read-all "feature-tests/sendfile-sun.c"))
+(define sendfile-linux-test (read-all "feature-tests/sendfile-linux.c"))
+(define mmap-test (read-all "feature-tests/mmap.c"))
 
 (define madvise? (try-compile madvise-test compile-only: #f))
 (define posix-fadvise? (try-compile posix-fadvise-test compile-only: #f))
