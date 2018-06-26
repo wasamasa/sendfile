@@ -1,0 +1,23 @@
+# -*- sh -*-
+
+check_feature() {
+  local feature="$1"
+  local test="$2"
+
+  if "$CHICKEN_CSC" -C "$CFLAGS" -L "$LDFLAGS" "feature-tests/$test.c" >/dev/null 2>/dev/null; then
+    feature_flags="$feature_flags -D$feature"
+  fi
+  rm -f feature-tests/$feature.o feature-tests/$feature
+}
+
+feature_flags=""
+
+check_feature madvise madvise
+check_feature mmap mmap
+check_feature posix-fadvise posix-fadvise
+check_feature sendfile sendfile-bsd
+check_feature sendfile sendfile-linux
+check_feature sendfile sendfile-macos
+check_feature sendfile sendfile-sun
+
+"$CHICKEN_CSC" $feature_flags -C "$CFLAGS" -L "$LDFLAGS" "$@"

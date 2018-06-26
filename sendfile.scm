@@ -32,18 +32,27 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(foreign-declare "#ifndef _XOPEN_SOURCE\n#define _XOPEN_SOURCE 600\n#endif")
-
 (module sendfile
 (force-implementation *last-selected-implementation* read-write-buffer-size
  implementation-selector impl:mmapped impl:sendfile impl:read-write-loop/fd
  impl:read-write-loop/port mmap-available sendfile-available sendfile %current-chunk-size)
-(import chicken scheme)
-(import-for-syntax chicken)
-(require-library posix lolevel srfi-4 data-structures)
-(import extras posix srfi-4 foreign lolevel ports (only data-structures alist-ref))
 
+(import scheme) ; Hack to get cond-expand in CHICKEN 4
 
+(cond-expand
+  (chicken-4
+   (import chicken)
+   (import-for-syntax chicken)
+   (require-library posix lolevel srfi-4 data-structures)
+   (import extras posix srfi-4 foreign lolevel ports (only data-structures alist-ref)))
+
+  (chicken-5
+   (import (chicken base) (chicken foreign) (chicken condition)
+           (chicken fixnum) (chicken io) (chicken file posix)
+           (chicken port) (chicken time) (chicken errno) (chicken memory)
+           memory-mapped-files)))
+
+(foreign-declare "#ifndef _XOPEN_SOURCE\n#define _XOPEN_SOURCE 600\n#endif")
 
 (include "backward-compatibility.scm")
 (include "backward-compatibility/pointer-offset.scm")

@@ -1,7 +1,14 @@
 ;;
 ;; %%HEADER%%
 ;;
-(use simple-sha1 tcp-server srfi-69 posix srfi-4)
+
+(cond-expand
+  (chicken-4 (use simple-sha1 srfi-69 posix srfi-4 srfi-13))
+  (else (import simple-sha1 srfi-69 srfi-4 srfi-13
+                (chicken process) (chicken process-context)
+                (chicken tcp) (chicken port) (chicken condition)
+                (chicken format) (chicken process signal) (chicken io)
+                (chicken file) (chicken file posix) (chicken bitwise))))
 
 (define (notify fmt . args)
   (apply printf fmt args)

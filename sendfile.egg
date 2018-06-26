@@ -1,0 +1,27 @@
+;; -*- scheme -*-
+((license "BSD")
+ (category net)
+ (author "David Krentzlin")
+ (test-dependencies test simple-sha1 srfi-4 srfi-13 srfi-69)
+ (synopsis "Sending a file over the network")
+ (components (extension sendfile
+                        (custom-build "build-sendfile")
+                        (source-dependencies
+                         "feature-tests/madvise.c"
+                         "feature-tests/mmap.c"
+                         "feature-tests/posix-fadvise.c"
+                         "feature-tests/sendfile-bsd.c"
+                         "feature-tests/sendfile-linux.c"
+                         "feature-tests/sendfile-macos.c"
+                         "feature-tests/sendfile-sun.c"
+
+                         "backward-compatibility.scm"
+                         "backward-compatibility/copy-port.scm"
+                         "backward-compatibility/pointer-offset.scm"
+
+                         "strategies/mmap.scm"
+                         "strategies/rw.scm"
+                         "strategies/sendfile.bsd.scm"
+                         "strategies/sendfile.linux.scm"
+                         "strategies/sendfile.macos.scm"
+                         "strategies/sendfile.solaris.scm"))))

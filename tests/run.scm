@@ -2,9 +2,11 @@
 ;; %%HEADER%%
 ;;
 
-(use test)
+(cond-expand
+  (chicken-4 (use test sendfile))
+  (else (import test sendfile)))
+
 (load "test-helper")
-(use sendfile)
 
 (test-begin "sendfile")
 
