@@ -46,6 +46,6 @@
   (install-extension
     'sendfile
     '("sendfile.so" "sendfile.import.so" "sendfile-static.o")
-    '((version "1.7.31")
+    '((version "1.8.0")
      (static "sendfile-static.o")
      (documentation "sendfile.html"))))
