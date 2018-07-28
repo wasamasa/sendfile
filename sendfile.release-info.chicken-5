@@ -1,0 +1,6 @@
+;; Release-info for CHICKEN 5
+
+(repo hg "https://bitbucket.org/certainty/{egg-name}")
+(uri targz "https://bitbucket.org/certainty/{egg-name}/get/{egg-release}.tar.gz")
+
+(release "1.8.0")
