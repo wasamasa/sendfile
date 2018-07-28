@@ -3,6 +3,7 @@
  (category net)
  (author "David Krentzlin")
  (test-dependencies test simple-sha1 srfi-4 srfi-13 srfi-69)
+ (dependencies memory-mapped-files)
  (synopsis "Sending a file over the network")
  (components (extension sendfile
                         (custom-build "build-sendfile")
