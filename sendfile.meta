@@ -1,5 +1,5 @@
 ((egg "sendfile.egg")
- (files "backward-compatibility.scm" "backward-compatibility/copy-port.scm" "backward-compatibility/pointer-offset.scm" "old-chickens-compat.scm" "readme.md" "sendfile.import.scm" "sendfile.meta" "sendfile.release-info" "sendfile.scm" "sendfile.setup" "strategies/mmap.scm" "strategies/rw.scm" "strategies/sendfile.bsd.scm" "strategies/sendfile.linux.scm" "strategies/sendfile.macos.scm" "strategies/sendfile.solaris.scm" "tests/benchmark.result" "tests/benchmark.scm" "tests/run.scm" "tests/test-helper.scm")
+ (files "backward-compatibility.scm" "backward-compatibility/copy-port.scm" "backward-compatibility/pointer-offset.scm" "build-sendfile" "build-sendfile.bat" "feature-tests/madvise.c" "feature-tests/mmap.c" "feature-tests/posix-fadvise.c" "feature-tests/sendfile-bsd.c" "feature-tests/sendfile-linux.c" "feature-tests/sendfile-macos.c" "feature-tests/sendfile-sun.c" "old-chickens-compat.scm" "readme.md" "sendfile.egg" "sendfile.meta" "sendfile.release-info" "sendfile.release-info.chicken-5" "sendfile.scm" "sendfile.setup" "strategies/mmap.scm" "strategies/rw.scm" "strategies/sendfile.bsd.scm" "strategies/sendfile.linux.scm" "strategies/sendfile.macos.scm" "strategies/sendfile.solaris.scm" "tests/benchmark.result" "tests/benchmark.scm" "tests/run.scm" "tests/test-helper.scm")
  (license "BSD")
  (category net)
  (author "David Krentzlin")
