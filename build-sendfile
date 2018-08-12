@@ -1,5 +1,4 @@
 # -*- sh -*-
-
 check_feature() {
   local feature="$1"
   local test="$2"
@@ -15,9 +14,19 @@ feature_flags=""
 check_feature madvise madvise
 check_feature mmap mmap
 check_feature posix-fadvise posix-fadvise
-check_feature sendfile sendfile-bsd
-check_feature sendfile sendfile-linux
-check_feature sendfile sendfile-macos
-check_feature sendfile sendfile-sun
+# Avoid false positives by only compiling when CHICKEN agrees that the
+# platform matches.
+if $CHICKEN_CSI -e "(cond-expand ((or netbsd freebsd openbsd) (exit 0)) (else (exit 1)))"; then
+    check_feature sendfile sendfile-bsd
+fi
+if $CHICKEN_CSI -e "(cond-expand (linux (exit 0)) (else (exit 1)))"; then
+    check_feature sendfile sendfile-linux
+fi
+if $CHICKEN_CSI -e "(cond-expand (macosx (exit 0)) (else (exit 1)))"; then
+    check_feature sendfile sendfile-macos
+fi
+if $CHICKEN_CSI -e "(cond-expand (sun (exit 0)) (else (exit 1)))"; then
+    check_feature sendfile sendfile-sun
+fi
 
 "$CHICKEN_CSC" $feature_flags -C "$CFLAGS" -L "$LDFLAGS" "$@"
