@@ -1,3 +1,4 @@
+#!/bin/sh
 # -*- sh -*-
 check_feature() {
   local feature="$1"
